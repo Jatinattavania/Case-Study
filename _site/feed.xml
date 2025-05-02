@@ -1,4 +1,72 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.5">Jekyll</generator><link href="http://localhost:4000/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/blog/" rel="alternate" type="text/html" /><updated>2024-08-09T19:08:02+05:30</updated><id>http://localhost:4000/blog/feed.xml</id><title type="html">5up3r541y4n’s blog</title><subtitle>Here I share my personal experience on whatever I am researching in the field of security, developing security tools, and any challenges that I face.</subtitle><entry><title type="html">Crackme: Baby’s first crackme</title><link href="http://localhost:4000/blog/reversing/reversing-labs/crackmes/2024/08/09/crackmes-one-babys-first-crackme.html" rel="alternate" type="text/html" title="Crackme: Baby’s first crackme" /><published>2024-08-09T10:03:24+05:30</published><updated>2024-08-09T10:03:24+05:30</updated><id>http://localhost:4000/blog/reversing/reversing-labs/crackmes/2024/08/09/crackmes-one-babys-first-crackme</id><content type="html" xml:base="http://localhost:4000/blog/reversing/reversing-labs/crackmes/2024/08/09/crackmes-one-babys-first-crackme.html"><![CDATA[<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.5">Jekyll</generator><link href="http://localhost:4000/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/blog/" rel="alternate" type="text/html" /><updated>2025-05-02T23:30:29+05:30</updated><id>http://localhost:4000/blog/feed.xml</id><title type="html">5up3r541y4n’s blog</title><subtitle>Here I share my personal experience on whatever I am researching in the field of security, developing security tools, and any challenges that I face.</subtitle><entry><title type="html">Pwnable.kr: fd Writeup</title><link href="http://localhost:4000/blog/binary-exploitation/binex-labs/2024/08/09/pwnable-kr-fd.html" rel="alternate" type="text/html" title="Pwnable.kr: fd Writeup" /><published>2024-08-09T10:03:24+05:30</published><updated>2024-08-09T10:03:24+05:30</updated><id>http://localhost:4000/blog/binary-exploitation/binex-labs/2024/08/09/pwnable-kr-fd</id><content type="html" xml:base="http://localhost:4000/blog/binary-exploitation/binex-labs/2024/08/09/pwnable-kr-fd.html"><![CDATA[<h3 id="challenge-url">Challenge URL</h3>
+
+<p><a href="https://pwnable.kr/play.php">Pwnable.kr</a></p>
+
+<h3 id="challenge">Challenge</h3>
+
+<p>We are given a binary (<code class="language-plaintext highlighter-rouge">fd</code>), a C file (<code class="language-plaintext highlighter-rouge">fd.c</code>), and a flag (<code class="language-plaintext highlighter-rouge">flag</code>). We do not have the permission to view the flag but we can somehow manipulate the input to the binary to get the flag.</p>
+
+<p>Let’s copy the necessary files from pwnable.kr’s server to our local machine.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">ssh <span class="nt">-p</span> 2222 fd@pwnable.kr
+<span class="c"># Enter password 'guest' when prompted</span>
+<span class="nb">ls</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">scp <span class="nt">-P</span> 2222 fd@pwnable.kr:/home/fd/fd.c <span class="nb">.</span>
+<span class="c"># Enter password 'guest' when prompted</span>
+vi fd.c</code></pre></figure>
+
+<h3 id="solution">Solution</h3>
+
+<p>Now we have the following C code:</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span><span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[],</span> <span class="kt">char</span><span class="o">*</span> <span class="n">envp</span><span class="p">[]){</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">argc</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">){</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"pass argv[1] a number</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">-</span> <span class="mh">0x1234</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">len</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">32</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="s">"LETMEWIN</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">buf</span><span class="p">)){</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"good job :)</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+		<span class="n">system</span><span class="p">(</span><span class="s">"/bin/cat flag"</span><span class="p">);</span>
+		<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"learn about Linux file IO</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">}</span></code></pre></figure>
+
+<p>According to the code, first it will check if the argument count (<code class="language-plaintext highlighter-rouge">argc</code>) is at least 2, if it is not then it will print <strong><em>“pass argv[1] a number”</em></strong> and exit. We know that whenever we run an executable the first argument is the path to the binary itself, so we need to pass 1 more argument and based on the exit prompt, it needs to be a number.</p>
+
+<p>Now when we pass a number as an argument, the program will put that in a function <code class="language-plaintext highlighter-rouge">atoi()</code>. According to the docs:</p>
+<blockquote>
+  <p>The atoi() function converts the initial portion of the string pointed to by nptr to int.</p>
+</blockquote>
+
+<p>It will then subtract <code class="language-plaintext highlighter-rouge">0x1234</code> or <code class="language-plaintext highlighter-rouge">4660</code> (in decimal) from that integer, the result is then assigned to an integer variable called <code class="language-plaintext highlighter-rouge">fd</code>. The fd variable is later being passed to <code class="language-plaintext highlighter-rouge">read()</code> function as a file descriptor and the <code class="language-plaintext highlighter-rouge">read()</code> function is storing the input to a 32 bytes sized buffer. A file descriptor is just a number we get when we open a connection to a file and in Linux almost everything is a file, we also know that in Linux the file descriptor 0 is for stdin, 1 is for stdout and 2 is for stderr.</p>
+
+<p>This means that if we pass the number <code class="language-plaintext highlighter-rouge">4660</code> as the argument to the binary, the value of the fd variable will be 0:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">fd</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="mi">4660</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0x1234</span>
+<span class="n">fd</span> <span class="o">=</span> <span class="mi">4660</span> <span class="o">-</span> <span class="mh">0x1234</span>
+<span class="c1"># Remember that the value of 0x1234 is 4660 in decimal
+</span><span class="n">fd</span> <span class="o">=</span> <span class="mi">0</span></code></pre></figure>
+
+<p>So, now we can pass the input to the program through stdin. Okay, now the program checks if the value in the buffer is <strong>“LETMEWIN\n”</strong>, if it is then it will print out the flag, this looks easy enough, we just need to enter that as the input to the program.</p>
+
+<p>Here’s a POC to make it faster:</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">ssh <span class="nt">-p</span> 2222 fd@pwnable.kr <span class="s2">"echo -ne </span><span class="se">\"</span><span class="s2">LETMEWIN</span><span class="se">\n\"</span><span class="s2"> | ./fd 4660"</span>
+<span class="c"># Enter password 'guest' when prompted</span></code></pre></figure>
+
+<p>This will get us our flag.
+Happy hacking :D</p>]]></content><author><name></name></author><category term="binary-exploitation" /><category term="binex-labs" /><summary type="html"><![CDATA[Challenge URL]]></summary></entry><entry><title type="html">Crackme: Baby’s first crackme</title><link href="http://localhost:4000/blog/reversing/reversing-labs/crackmes/2024/08/09/crackmes-one-babys-first-crackme.html" rel="alternate" type="text/html" title="Crackme: Baby’s first crackme" /><published>2024-08-09T10:03:24+05:30</published><updated>2024-08-09T10:03:24+05:30</updated><id>http://localhost:4000/blog/reversing/reversing-labs/crackmes/2024/08/09/crackmes-one-babys-first-crackme</id><content type="html" xml:base="http://localhost:4000/blog/reversing/reversing-labs/crackmes/2024/08/09/crackmes-one-babys-first-crackme.html"><![CDATA[<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
 
 <p>Jekyll requires blog post files to be named according to the following format:</p>
 
@@ -16,22 +84,4 @@
 
 <figure class="highlight"><pre><code class="language-nasm" data-lang="nasm"><span class="nf">break</span> <span class="o">*</span><span class="nv">main</span> <span class="o">+</span> <span class="mi">32</span></code></pre></figure>
 
-<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name></name></author><category term="reversing" /><category term="reversing-labs" /><category term="crackmes" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry><entry><title type="html">Pwnable.kr: fd</title><link href="http://localhost:4000/blog/binary-exploitation/2024/08/09/pwnable-kr-fd.html" rel="alternate" type="text/html" title="Pwnable.kr: fd" /><published>2024-08-09T10:03:24+05:30</published><updated>2024-08-09T10:03:24+05:30</updated><id>http://localhost:4000/blog/binary-exploitation/2024/08/09/pwnable-kr-fd</id><content type="html" xml:base="http://localhost:4000/blog/binary-exploitation/2024/08/09/pwnable-kr-fd.html"><![CDATA[<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
-
-<p>Jekyll requires blog post files to be named according to the following format:</p>
-
-<p><code class="language-plaintext highlighter-rouge">YEAR-MONTH-DAY-title.MARKUP</code></p>
-
-<p>Where <code class="language-plaintext highlighter-rouge">YEAR</code> is a four-digit number, <code class="language-plaintext highlighter-rouge">MONTH</code> and <code class="language-plaintext highlighter-rouge">DAY</code> are both two-digit numbers, and <code class="language-plaintext highlighter-rouge">MARKUP</code> is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
-
-<p>Jekyll also offers powerful support for code snippets:</p>
-
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">end</span>
-<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
-<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-nasm" data-lang="nasm"><span class="nf">break</span> <span class="o">*</span><span class="nv">main</span> <span class="o">+</span> <span class="mi">32</span></code></pre></figure>
-
-<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name></name></author><category term="binary-exploitation" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry></feed>
+<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name></name></author><category term="reversing" /><category term="reversing-labs" /><category term="crackmes" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry></feed>
