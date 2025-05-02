@@ -21,7 +21,7 @@
 title: CaseStudy
 description: >- # this means to ignore newlines until "baseurl:"
   Here I share my personal experience on whatever I am researching in the field of security, developing security tools, and any challenges that I face.
-baseurl: "/blog" # the subpath of your site, e.g. /blog
+baseurl: "/Case-Study" # the subpath of your site, e.g. /blog
 url: "http://jatinattavania.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: #
 github_username:  jatinattavania
